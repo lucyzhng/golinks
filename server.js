@@ -7,7 +7,7 @@ const port = 3000;
 const { Octokit } = require('@octokit/rest');
 
 const octokit = new Octokit({
-  auth: "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"
+  auth: "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"
 })
 
 
@@ -114,7 +114,16 @@ app.get('/search/:userName', async (req, res) => {
         
       }
     }
-    const averageSize = repoSizesSum / reposCt;
+    let averageSize = repoSizesSum / reposCt;
+    console.log(averageSize);
+    let sizeUnit = "KB";
+    if (averageSize >= 10**6) {
+      averageSize = averageSize / (10**6);
+      sizeUnit = "GB";
+    } else if (averageSize >= 10**3) {
+      averageSize = averageSize / (10**3);
+      sizeUnit = "MB";
+    }
     
     const languagesFrequencySortedDesc = Object.entries(languagesFrequency).sort(([,v1], [,v2]) => +v2 - +v1);
     // console.log(languagesFrequencySortedDesc)
@@ -123,7 +132,7 @@ app.get('/search/:userName', async (req, res) => {
       "Total Repositories": reposCt,
       "Total Stargazers": totalStarGazers,
       "Total Forks": totalRepoForks,
-      "Average Size": averageSize,
+      "Average Size": averageSize.toString() + sizeUnit,
       "Languages Used": languagesFrequencySortedDesc,
     };
     // console.log(data);
