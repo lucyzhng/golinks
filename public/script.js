@@ -1,10 +1,11 @@
 async function search() {
     const userName = document.getElementById('searchInput').value;
     const forkedCheckbox = document.getElementById('forkedCheckbox');
-    const forked = forkedCheckbox.checked;
+    const forked = Boolena(forkedCheckbox.checked);
     const url = `/search/${userName}?forked=${forked}`;
     const response = await fetch(url);
     const data = await response.json();
+    console.log(data);
     const searchResults = document.getElementById('searchResults');
     searchResults.innerHTML = '';
     for (const [key, value] of Object.entries(data)) {

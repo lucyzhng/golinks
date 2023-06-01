@@ -5,10 +5,9 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 const app = express();
 const port = 3000;
 const { Octokit } = require('@octokit/rest');
-const { response } = require('express');
 
 const octokit = new Octokit({
-  auth: "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"
+  auth: "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"
 })
 
 
@@ -21,7 +20,7 @@ function nextPageExists(linkHeader) {
   const links = linkHeader.split(',');
   for (const link of links) {
     const [url, rel] = link.split(';');
-    if (rel.trim() === 'rel="next"') {
+    if (rel.trim() == 'rel="next"') {
       return true;
     }
   }
@@ -44,8 +43,7 @@ async function getUserRepositoryData(userName) {
     })
     repositoryData = repositoryData.concat(response.data);
     const linkHeader = response.headers.link;
-    const nextPageUrl = nextPageExists(linkHeader);
-    if (!nextPageUrl) {
+    if (!nextPageExists(linkHeader)) {
       break; 
     }
     page++; 
@@ -86,7 +84,7 @@ async function getRepoLanguages(userName,repoName) {
 
 app.get('/search/:userName', async (req, res) => {
   const userName = req.params.userName;
-  const getForked = req.query.forked;
+  const getForked = req.query.forked == 'true';
   try {
     const userRepositoryData = await getUserRepositoryData(userName);
     const repositoryNames = getRepositoryNames(userRepositoryData);
@@ -99,7 +97,8 @@ app.get('/search/:userName', async (req, res) => {
     for (const repoName of repositoryNames) {
       const repoData = await getRepoData(userName,repoName);
       const isFork = repoData.fork;
-      if (isFork != Boolean(getForked)){
+      console.log(isFork,getForked);
+      if (isFork != getForked){
         continue 
       }
         totalStarGazers += repoData.stargazers_count;
@@ -118,8 +117,8 @@ app.get('/search/:userName', async (req, res) => {
     const averageSize = repoSizesSum / reposCt;
     
     const languagesFrequencySortedDesc = Object.entries(languagesFrequency).sort(([,v1], [,v2]) => +v2 - +v1);
-    console.log(languagesFrequencySortedDesc)
-    console.log(reposCt, totalStarGazers, totalRepoForks, repoSizesSum/reposCt, reposCt)
+    // console.log(languagesFrequencySortedDesc)
+    // console.log(reposCt, totalStarGazers, totalRepoForks, repoSizesSum/reposCt, reposCt)
     const data = {
       "Total Repositories": reposCt,
       "Total Stargazers": totalStarGazers,
@@ -127,7 +126,7 @@ app.get('/search/:userName', async (req, res) => {
       "Average Size": averageSize,
       "Languages Used": languagesFrequencySortedDesc,
     };
-    console.log(data);
+    // console.log(data);
     res.json(data);
   } catch (error) {
     console.error('Error searching repositories:', error);
