@@ -127,6 +127,7 @@ app.get('/search/:userName', async (req, res) => {
       "Average Size": averageSize,
       "Languages Used": languagesFrequencySortedDesc,
     };
+    console.log(data);
     res.json(data);
   } catch (error) {
     console.error('Error searching repositories:', error);
